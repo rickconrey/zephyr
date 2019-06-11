@@ -13,6 +13,7 @@
 #include <kernel.h>
 #include <init.h>
 #include <soc.h>
+#include <sys/printk.h>
 
 #define ADC_CONTEXT_USES_KERNEL_TIMER
 #include "adc_context.h"
@@ -189,7 +190,7 @@ struct adc_stm32_cfg {
 };
 
 static int check_buffer_size(const struct adc_sequence *sequence,
-			     u8_t active_channels)
+				 u8_t active_channels)
 {
 	size_t needed_buffer_size;
 
@@ -210,6 +211,7 @@ static int check_buffer_size(const struct adc_sequence *sequence,
 
 static void adc_stm32_start_conversion(struct device *dev)
 {
+    //printk("ADC start conversion.\n");
 	const struct adc_stm32_cfg *config = dev->config->config_info;
 	ADC_TypeDef *adc = (ADC_TypeDef *)config->base;
 
@@ -262,17 +264,24 @@ static int start_read(struct device *dev, const struct adc_sequence *sequence)
 	u32_t channels = sequence->channels;
 
 	data->buffer = sequence->buffer;
+
 	u8_t index;
 
 	index = find_lsb_set(channels) - 1;
+//#if defined(CONFIG_SOC_SERIES_STM32WBX)
+//	u32_t channel = __LL_ADC_DECIMAL_NB_TO_CHANNEL(channels);
+//#else
 	u32_t channel = __LL_ADC_DECIMAL_NB_TO_CHANNEL(index);
+//#endif
 #if defined(CONFIG_SOC_SERIES_STM32F0X) || \
 	defined(CONFIG_SOC_SERIES_STM32L0X)
 	LL_ADC_REG_SetSequencerChannels(adc, channel);
 #else
-	LL_ADC_REG_SetSequencerRanks(adc, table_rank[0], channel);
-	LL_ADC_REG_SetSequencerLength(adc, table_seq_len[0]);
+	//LL_ADC_REG_SetSequencerRanks(adc, table_rank[0], channel);
+	LL_ADC_REG_SetSequencerLength(adc, table_seq_len[4]);
+	LL_ADC_SetChannelSingleDiff(adc, channel, LL_ADC_SINGLE_ENDED);
 #endif
+
 	data->channel_count = 1;
 
 	err = check_buffer_size(sequence, data->channel_count);
@@ -290,7 +299,7 @@ static int start_read(struct device *dev, const struct adc_sequence *sequence)
 	defined(CONFIG_SOC_SERIES_STM32L4X) || \
 	defined(CONFIG_SOC_SERIES_STM32WBX) || \
 	defined(CONFIG_SOC_SERIES_STM32G4X)
-	LL_ADC_EnableIT_EOC(adc);
+	//LL_ADC_EnableIT_EOC(adc);
 #elif defined(CONFIG_SOC_SERIES_STM32F1X)
 	LL_ADC_EnableIT_EOS(adc);
 #else
@@ -299,7 +308,8 @@ static int start_read(struct device *dev, const struct adc_sequence *sequence)
 
 	adc_context_start_read(&data->ctx, sequence);
 
-	return adc_context_wait_for_completion(&data->ctx);
+    return 0;
+	//return adc_context_wait_for_completion(&data->ctx);
 }
 
 static void adc_context_start_sampling(struct adc_context *ctx)
@@ -313,7 +323,7 @@ static void adc_context_start_sampling(struct adc_context *ctx)
 }
 
 static void adc_context_update_buffer_pointer(struct adc_context *ctx,
-					      bool repeat_sampling)
+						  bool repeat_sampling)
 {
 	struct adc_stm32_data *data =
 		CONTAINER_OF(ctx, struct adc_stm32_data, ctx);
@@ -332,6 +342,7 @@ static void adc_stm32_isr(void *arg)
 	ADC_TypeDef *adc = config->base;
 
 	*data->buffer++ = LL_ADC_REG_ReadConversionData32(adc);
+    //printk("ADC ISR, data: %d\n", *data->buffer);
 
 	adc_context_on_sampling_done(&data->ctx, dev);
 
@@ -371,7 +382,7 @@ static int adc_stm32_check_acq_time(u16_t acq_time)
 {
 	for (int i = 0; i < 8; i++) {
 		if (acq_time == ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS,
-					     acq_time_tbl[i])) {
+						 acq_time_tbl[i])) {
 			return i;
 		}
 	}
@@ -402,7 +413,7 @@ static void adc_stm32_setup_speed(struct device *dev, u8_t id,
 }
 
 static int adc_stm32_channel_setup(struct device *dev,
-			    const struct adc_channel_cfg *channel_cfg)
+				const struct adc_channel_cfg *channel_cfg)
 {
 #if defined(CONFIG_SOC_SERIES_STM32F0X) || defined(CONFIG_SOC_SERIES_STM32L0X)
 	struct adc_stm32_data *data = dev->driver_data;
@@ -610,6 +621,10 @@ static int adc_stm32_init(struct device *dev)
 	}
 #endif
 
+#ifdef CONFIG_SOC_SERIES_STM32WBX
+	LL_ADC_REG_SetTriggerSource(adc, LL_ADC_REG_TRIG_SOFTWARE);
+#endif
+
 	config->irq_cfg_func();
 
 #ifdef CONFIG_SOC_SERIES_STM32F1X
@@ -649,14 +664,14 @@ static struct adc_stm32_data adc_stm32_data_##index = {			\
 };									\
 									\
 DEVICE_AND_API_INIT(adc_##index, DT_ADC_##index##_NAME, &adc_stm32_init,\
-		    &adc_stm32_data_##index, &adc_stm32_cfg_##index,	\
-		    POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	\
-		    &api_stm32_driver_api);				\
+			&adc_stm32_data_##index, &adc_stm32_cfg_##index,	\
+			POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,	\
+			&api_stm32_driver_api);				\
 									\
 static void adc_stm32_cfg_func_##index(void)				\
 {									\
 	IRQ_CONNECT(DT_ADC_##index##_IRQ, DT_ADC_##index##_IRQ_PRI,	\
-		    adc_stm32_isr, DEVICE_GET(adc_##index), 0);		\
+			adc_stm32_isr, DEVICE_GET(adc_##index), 0);		\
 	irq_enable(DT_ADC_##index##_IRQ);				\
 }
 
