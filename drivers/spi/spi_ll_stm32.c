@@ -60,7 +60,7 @@ static int spi_stm32_get_err(SPI_TypeDef *spi)
 
 	if (sr & SPI_STM32_ERR_MSK) {
 		LOG_ERR("%s: err=%d", __func__,
-			    sr & (u32_t)SPI_STM32_ERR_MSK);
+				sr & (u32_t)SPI_STM32_ERR_MSK);
 
 		/* OVR error must be explicitly cleared */
 		if (LL_SPI_IsActiveFlag_OVR(spi)) {
@@ -185,7 +185,7 @@ static int spi_stm32_shift_frames(SPI_TypeDef *spi, struct spi_stm32_data *data)
 }
 
 static void spi_stm32_complete(struct spi_stm32_data *data, SPI_TypeDef *spi,
-			       int status)
+				   int status)
 {
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 	ll_func_disable_int_tx_empty(spi);
@@ -245,7 +245,7 @@ static void spi_stm32_isr(void *arg)
 #endif
 
 static int spi_stm32_configure(struct device *dev,
-			       const struct spi_config *config)
+				   const struct spi_config *config)
 {
 	const struct spi_stm32_config *cfg = DEV_CFG(dev);
 	struct spi_stm32_data *data = DEV_DATA(dev);
@@ -269,7 +269,7 @@ static int spi_stm32_configure(struct device *dev,
 	}
 
 	if ((SPI_WORD_SIZE_GET(config->operation) != 8)
-	    && (SPI_WORD_SIZE_GET(config->operation) != 16)) {
+		&& (SPI_WORD_SIZE_GET(config->operation) != 16)) {
 		return -ENOTSUP;
 	}
 
@@ -289,9 +289,9 @@ static int spi_stm32_configure(struct device *dev,
 
 	if (br > ARRAY_SIZE(scaler)) {
 		LOG_ERR("Unsupported frequency %uHz, max %uHz, min %uHz",
-			    config->frequency,
-			    clock >> 1,
-			    clock >> ARRAY_SIZE(scaler));
+				config->frequency,
+				clock >> 1,
+				clock >> ARRAY_SIZE(scaler));
 		return -EINVAL;
 	}
 
@@ -356,18 +356,18 @@ static int spi_stm32_configure(struct device *dev,
 	spi_context_cs_configure(&data->ctx);
 
 	LOG_DBG("Installed config %p: freq %uHz (div = %u),"
-		    " mode %u/%u/%u, slave %u",
-		    config, clock >> br, 1 << br,
-		    (SPI_MODE_GET(config->operation) & SPI_MODE_CPOL) ? 1 : 0,
-		    (SPI_MODE_GET(config->operation) & SPI_MODE_CPHA) ? 1 : 0,
-		    (SPI_MODE_GET(config->operation) & SPI_MODE_LOOP) ? 1 : 0,
-		    config->slave);
+			" mode %u/%u/%u, slave %u",
+			config, clock >> br, 1 << br,
+			(SPI_MODE_GET(config->operation) & SPI_MODE_CPOL) ? 1 : 0,
+			(SPI_MODE_GET(config->operation) & SPI_MODE_CPHA) ? 1 : 0,
+			(SPI_MODE_GET(config->operation) & SPI_MODE_LOOP) ? 1 : 0,
+			config->slave);
 
 	return 0;
 }
 
 static int spi_stm32_release(struct device *dev,
-			     const struct spi_config *config)
+				 const struct spi_config *config)
 {
 	struct spi_stm32_data *data = DEV_DATA(dev);
 
@@ -377,10 +377,10 @@ static int spi_stm32_release(struct device *dev,
 }
 
 static int transceive(struct device *dev,
-		      const struct spi_config *config,
-		      const struct spi_buf_set *tx_bufs,
-		      const struct spi_buf_set *rx_bufs,
-		      bool asynchronous, struct k_poll_signal *signal)
+			  const struct spi_config *config,
+			  const struct spi_buf_set *tx_bufs,
+			  const struct spi_buf_set *rx_bufs,
+			  bool asynchronous, struct k_poll_signal *signal)
 {
 	const struct spi_stm32_config *cfg = DEV_CFG(dev);
 	struct spi_stm32_data *data = DEV_DATA(dev);
@@ -459,10 +459,10 @@ static int spi_stm32_transceive(struct device *dev,
 
 #ifdef CONFIG_SPI_ASYNC
 static int spi_stm32_transceive_async(struct device *dev,
-				      const struct spi_config *config,
-				      const struct spi_buf_set *tx_bufs,
-				      const struct spi_buf_set *rx_bufs,
-				      struct k_poll_signal *async)
+					  const struct spi_config *config,
+					  const struct spi_buf_set *tx_bufs,
+					  const struct spi_buf_set *rx_bufs,
+					  struct k_poll_signal *async)
 {
 	return transceive(dev, config, tx_bufs, rx_bufs, true, async);
 }
@@ -484,7 +484,7 @@ static int spi_stm32_init(struct device *dev)
 	__ASSERT_NO_MSG(device_get_binding(STM32_CLOCK_CONTROL_NAME));
 
 	if (clock_control_on(device_get_binding(STM32_CLOCK_CONTROL_NAME),
-			       (clock_control_subsys_t) &cfg->pclken) != 0) {
+				   (clock_control_subsys_t) &cfg->pclken) != 0) {
 		LOG_ERR("Could not enable SPI clock");
 		return -EIO;
 	}
