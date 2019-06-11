@@ -60,7 +60,7 @@ static int spi_stm32_get_err(SPI_TypeDef *spi)
 
 	if (sr & SPI_STM32_ERR_MSK) {
 		LOG_ERR("%s: err=%d", __func__,
-			    sr & (u32_t)SPI_STM32_ERR_MSK);
+				sr & (u32_t)SPI_STM32_ERR_MSK);
 
 		/* OVR error must be explicitly cleared */
 		if (LL_SPI_IsActiveFlag_OVR(spi)) {
@@ -193,7 +193,7 @@ static int spi_stm32_shift_frames(SPI_TypeDef *spi, struct spi_stm32_data *data)
 }
 
 static void spi_stm32_complete(struct spi_stm32_data *data, SPI_TypeDef *spi,
-			       int status)
+				   int status)
 {
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 	ll_func_disable_int_tx_empty(spi);
@@ -253,7 +253,7 @@ static void spi_stm32_isr(void *arg)
 #endif
 
 static int spi_stm32_configure(struct device *dev,
-			       const struct spi_config *config)
+				   const struct spi_config *config)
 {
 	const struct spi_stm32_config *cfg = DEV_CFG(dev);
 	struct spi_stm32_data *data = DEV_DATA(dev);
@@ -277,12 +277,12 @@ static int spi_stm32_configure(struct device *dev,
 	}
 
 	if ((SPI_WORD_SIZE_GET(config->operation) != 8)
-	    && (SPI_WORD_SIZE_GET(config->operation) != 16)) {
+		&& (SPI_WORD_SIZE_GET(config->operation) != 16)) {
 		return -ENOTSUP;
 	}
 
 	clock_control_get_rate(device_get_binding(STM32_CLOCK_CONTROL_NAME),
-			       (clock_control_subsys_t) &cfg->pclken, &clock);
+				   (clock_control_subsys_t) &cfg->pclken, &clock);
 
 	for (br = 1 ; br <= ARRAY_SIZE(scaler) ; ++br) {
 		u32_t clk = clock >> br;
@@ -294,9 +294,9 @@ static int spi_stm32_configure(struct device *dev,
 
 	if (br > ARRAY_SIZE(scaler)) {
 		LOG_ERR("Unsupported frequency %uHz, max %uHz, min %uHz",
-			    config->frequency,
-			    clock >> 1,
-			    clock >> ARRAY_SIZE(scaler));
+				config->frequency,
+				clock >> 1,
+				clock >> ARRAY_SIZE(scaler));
 		return -EINVAL;
 	}
 
@@ -361,18 +361,18 @@ static int spi_stm32_configure(struct device *dev,
 	spi_context_cs_configure(&data->ctx);
 
 	LOG_DBG("Installed config %p: freq %uHz (div = %u),"
-		    " mode %u/%u/%u, slave %u",
-		    config, clock >> br, 1 << br,
-		    (SPI_MODE_GET(config->operation) & SPI_MODE_CPOL) ? 1 : 0,
-		    (SPI_MODE_GET(config->operation) & SPI_MODE_CPHA) ? 1 : 0,
-		    (SPI_MODE_GET(config->operation) & SPI_MODE_LOOP) ? 1 : 0,
-		    config->slave);
+			" mode %u/%u/%u, slave %u",
+			config, clock >> br, 1 << br,
+			(SPI_MODE_GET(config->operation) & SPI_MODE_CPOL) ? 1 : 0,
+			(SPI_MODE_GET(config->operation) & SPI_MODE_CPHA) ? 1 : 0,
+			(SPI_MODE_GET(config->operation) & SPI_MODE_LOOP) ? 1 : 0,
+			config->slave);
 
 	return 0;
 }
 
 static int spi_stm32_release(struct device *dev,
-			     const struct spi_config *config)
+				 const struct spi_config *config)
 {
 	struct spi_stm32_data *data = DEV_DATA(dev);
 
@@ -382,10 +382,10 @@ static int spi_stm32_release(struct device *dev,
 }
 
 static int transceive(struct device *dev,
-		      const struct spi_config *config,
-		      const struct spi_buf_set *tx_bufs,
-		      const struct spi_buf_set *rx_bufs,
-		      bool asynchronous, struct k_poll_signal *signal)
+			  const struct spi_config *config,
+			  const struct spi_buf_set *tx_bufs,
+			  const struct spi_buf_set *rx_bufs,
+			  bool asynchronous, struct k_poll_signal *signal)
 {
 	const struct spi_stm32_config *cfg = DEV_CFG(dev);
 	struct spi_stm32_data *data = DEV_DATA(dev);
@@ -464,10 +464,10 @@ static int spi_stm32_transceive(struct device *dev,
 
 #ifdef CONFIG_SPI_ASYNC
 static int spi_stm32_transceive_async(struct device *dev,
-				      const struct spi_config *config,
-				      const struct spi_buf_set *tx_bufs,
-				      const struct spi_buf_set *rx_bufs,
-				      struct k_poll_signal *async)
+					  const struct spi_config *config,
+					  const struct spi_buf_set *tx_bufs,
+					  const struct spi_buf_set *rx_bufs,
+					  struct k_poll_signal *async)
 {
 	return transceive(dev, config, tx_bufs, rx_bufs, true, async);
 }
@@ -489,7 +489,7 @@ static int spi_stm32_init(struct device *dev)
 	__ASSERT_NO_MSG(device_get_binding(STM32_CLOCK_CONTROL_NAME));
 
 	if (clock_control_on(device_get_binding(STM32_CLOCK_CONTROL_NAME),
-			       (clock_control_subsys_t) &cfg->pclken) != 0) {
+				   (clock_control_subsys_t) &cfg->pclken) != 0) {
 		LOG_ERR("Could not enable SPI clock");
 		return -EIO;
 	}
@@ -526,15 +526,15 @@ static struct spi_stm32_data spi_stm32_dev_data_1 = {
 };
 
 DEVICE_AND_API_INIT(spi_stm32_1, DT_SPI_1_NAME, &spi_stm32_init,
-		    &spi_stm32_dev_data_1, &spi_stm32_cfg_1,
-		    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
-		    &api_funcs);
+			&spi_stm32_dev_data_1, &spi_stm32_cfg_1,
+			POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
+			&api_funcs);
 
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 static void spi_stm32_irq_config_func_1(struct device *dev)
 {
 	IRQ_CONNECT(DT_SPI_1_IRQ, DT_SPI_1_IRQ_PRI,
-		    spi_stm32_isr, DEVICE_GET(spi_stm32_1), 0);
+			spi_stm32_isr, DEVICE_GET(spi_stm32_1), 0);
 	irq_enable(DT_SPI_1_IRQ);
 }
 #endif
@@ -564,15 +564,15 @@ static struct spi_stm32_data spi_stm32_dev_data_2 = {
 };
 
 DEVICE_AND_API_INIT(spi_stm32_2, DT_SPI_2_NAME, &spi_stm32_init,
-		    &spi_stm32_dev_data_2, &spi_stm32_cfg_2,
-		    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
-		    &api_funcs);
+			&spi_stm32_dev_data_2, &spi_stm32_cfg_2,
+			POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
+			&api_funcs);
 
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 static void spi_stm32_irq_config_func_2(struct device *dev)
 {
 	IRQ_CONNECT(DT_SPI_2_IRQ, DT_SPI_2_IRQ_PRI,
-		    spi_stm32_isr, DEVICE_GET(spi_stm32_2), 0);
+			spi_stm32_isr, DEVICE_GET(spi_stm32_2), 0);
 	irq_enable(DT_SPI_2_IRQ);
 }
 #endif
@@ -602,15 +602,15 @@ static struct spi_stm32_data spi_stm32_dev_data_3 = {
 };
 
 DEVICE_AND_API_INIT(spi_stm32_3, DT_SPI_3_NAME, &spi_stm32_init,
-		    &spi_stm32_dev_data_3, &spi_stm32_cfg_3,
-		    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
-		    &api_funcs);
+			&spi_stm32_dev_data_3, &spi_stm32_cfg_3,
+			POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
+			&api_funcs);
 
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 static void spi_stm32_irq_config_func_3(struct device *dev)
 {
 	IRQ_CONNECT(DT_SPI_3_IRQ, DT_SPI_3_IRQ_PRI,
-		    spi_stm32_isr, DEVICE_GET(spi_stm32_3), 0);
+			spi_stm32_isr, DEVICE_GET(spi_stm32_3), 0);
 	irq_enable(DT_SPI_3_IRQ);
 }
 #endif
@@ -640,15 +640,15 @@ static struct spi_stm32_data spi_stm32_dev_data_4 = {
 };
 
 DEVICE_AND_API_INIT(spi_stm32_4, DT_SPI_4_NAME, &spi_stm32_init,
-		    &spi_stm32_dev_data_4, &spi_stm32_cfg_4,
-		    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
-		    &api_funcs);
+			&spi_stm32_dev_data_4, &spi_stm32_cfg_4,
+			POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
+			&api_funcs);
 
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 static void spi_stm32_irq_config_func_4(struct device *dev)
 {
 	IRQ_CONNECT(DT_SPI_4_IRQ, DT_SPI_4_IRQ_PRI,
-		    spi_stm32_isr, DEVICE_GET(spi_stm32_4), 0);
+			spi_stm32_isr, DEVICE_GET(spi_stm32_4), 0);
 	irq_enable(DT_SPI_4_IRQ);
 }
 #endif
@@ -678,15 +678,15 @@ static struct spi_stm32_data spi_stm32_dev_data_5 = {
 };
 
 DEVICE_AND_API_INIT(spi_stm32_5, DT_SPI_5_NAME, &spi_stm32_init,
-		    &spi_stm32_dev_data_5, &spi_stm32_cfg_5,
-		    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
-		    &api_funcs);
+			&spi_stm32_dev_data_5, &spi_stm32_cfg_5,
+			POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
+			&api_funcs);
 
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 static void spi_stm32_irq_config_func_5(struct device *dev)
 {
 	IRQ_CONNECT(DT_SPI_5_IRQ, DT_SPI_5_IRQ_PRI,
-		    spi_stm32_isr, DEVICE_GET(spi_stm32_5), 0);
+			spi_stm32_isr, DEVICE_GET(spi_stm32_5), 0);
 	irq_enable(DT_SPI_5_IRQ);
 }
 #endif
@@ -716,15 +716,15 @@ static struct spi_stm32_data spi_stm32_dev_data_6 = {
 };
 
 DEVICE_AND_API_INIT(spi_stm32_6, DT_SPI_6_NAME, &spi_stm32_init,
-		    &spi_stm32_dev_data_6, &spi_stm32_cfg_6,
-		    POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
-		    &api_funcs);
+			&spi_stm32_dev_data_6, &spi_stm32_cfg_6,
+			POST_KERNEL, CONFIG_SPI_INIT_PRIORITY,
+			&api_funcs);
 
 #ifdef CONFIG_SPI_STM32_INTERRUPT
 static void spi_stm32_irq_config_func_6(struct device *dev)
 {
 	IRQ_CONNECT(DT_SPI_6_IRQ, DT_SPI_6_IRQ_PRI,
-		    spi_stm32_isr, DEVICE_GET(spi_stm32_6), 0);
+			spi_stm32_isr, DEVICE_GET(spi_stm32_6), 0);
 	irq_enable(DT_SPI_6_IRQ);
 }
 #endif
