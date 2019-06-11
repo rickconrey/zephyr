@@ -63,7 +63,7 @@ void main(void)
 	period = max_period;
 	while (1) {
 		if (pwm_pin_set_usec(pwm_dev, PWM_CHANNEL,
-				     period, period / 2U)) {
+					 period, period / 2U)) {
 			printk("pwm pin set fails\n");
 			return;
 		}
