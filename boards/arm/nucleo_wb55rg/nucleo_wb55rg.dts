@@ -81,6 +81,10 @@
 	status = "okay";
 };
 
+&lptimers1 {
+	status = "okay";
+};
+
 &timers2 {
 	status = "okay";
 

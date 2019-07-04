@@ -266,11 +266,11 @@ static int start_read(struct device *dev, const struct adc_sequence *sequence)
 	u8_t index;
 
 	index = find_lsb_set(channels) - 1;
-#if defined(CONFIG_SOC_SERIES_STM32WBX)
-	u32_t channel = __LL_ADC_DECIMAL_NB_TO_CHANNEL(channels);
-#else
+//#if defined(CONFIG_SOC_SERIES_STM32WBX)
+//	u32_t channel = __LL_ADC_DECIMAL_NB_TO_CHANNEL(channels);
+//#else
 	u32_t channel = __LL_ADC_DECIMAL_NB_TO_CHANNEL(index);
-#endif
+//#endif
 #if defined(CONFIG_SOC_SERIES_STM32F0X) || \
 	defined(CONFIG_SOC_SERIES_STM32L0X)
 	LL_ADC_REG_SetSequencerChannels(adc, channel);
