@@ -13,6 +13,7 @@
 #include <kernel.h>
 #include <init.h>
 #include <soc.h>
+#include <sys/printk.h>
 
 #define ADC_CONTEXT_USES_KERNEL_TIMER
 #include "adc_context.h"
@@ -210,6 +211,7 @@ static int check_buffer_size(const struct adc_sequence *sequence,
 
 static void adc_stm32_start_conversion(struct device *dev)
 {
+    //printk("ADC start conversion.\n");
 	const struct adc_stm32_cfg *config = dev->config->config_info;
 	ADC_TypeDef *adc = (ADC_TypeDef *)config->base;
 
@@ -275,8 +277,8 @@ static int start_read(struct device *dev, const struct adc_sequence *sequence)
 	defined(CONFIG_SOC_SERIES_STM32L0X)
 	LL_ADC_REG_SetSequencerChannels(adc, channel);
 #else
-	LL_ADC_REG_SetSequencerRanks(adc, table_rank[0], channel);
-	LL_ADC_REG_SetSequencerLength(adc, table_seq_len[0]);
+	//LL_ADC_REG_SetSequencerRanks(adc, table_rank[0], channel);
+	LL_ADC_REG_SetSequencerLength(adc, table_seq_len[4]);
 	LL_ADC_SetChannelSingleDiff(adc, channel, LL_ADC_SINGLE_ENDED);
 #endif
 
@@ -297,7 +299,7 @@ static int start_read(struct device *dev, const struct adc_sequence *sequence)
 	defined(CONFIG_SOC_SERIES_STM32L4X) || \
 	defined(CONFIG_SOC_SERIES_STM32WBX) || \
 	defined(CONFIG_SOC_SERIES_STM32G4X)
-	LL_ADC_EnableIT_EOC(adc);
+	//LL_ADC_EnableIT_EOC(adc);
 #elif defined(CONFIG_SOC_SERIES_STM32F1X)
 	LL_ADC_EnableIT_EOS(adc);
 #else
@@ -306,7 +308,8 @@ static int start_read(struct device *dev, const struct adc_sequence *sequence)
 
 	adc_context_start_read(&data->ctx, sequence);
 
-	return adc_context_wait_for_completion(&data->ctx);
+    return 0;
+	//return adc_context_wait_for_completion(&data->ctx);
 }
 
 static void adc_context_start_sampling(struct adc_context *ctx)
@@ -339,6 +342,7 @@ static void adc_stm32_isr(void *arg)
 	ADC_TypeDef *adc = config->base;
 
 	*data->buffer++ = LL_ADC_REG_ReadConversionData32(adc);
+    //printk("ADC ISR, data: %d\n", *data->buffer);
 
 	adc_context_on_sampling_done(&data->ctx, dev);
 
