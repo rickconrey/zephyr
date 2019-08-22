@@ -93,6 +93,10 @@
 	};
 };
 
+&usbotg_fs {
+    status = "okay";
+};
+
 &rtc {
 	status = "okay";
 };
