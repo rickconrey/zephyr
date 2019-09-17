@@ -113,7 +113,7 @@ static int pwm_stm32_pin_set(struct device *dev, u32_t pwm,
 	/* Configure Timer IP */
 	TimerHandle->Instance = PWM_STRUCT(dev);
 	TimerHandle->Init.Prescaler = data->pwm_prescaler;
-	TimerHandle->Init.ClockDivision = 0;
+	TimerHandle->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	TimerHandle->Init.CounterMode = TIM_COUNTERMODE_UP;
 	TimerHandle->Init.RepetitionCounter = 0;
 
@@ -124,7 +124,14 @@ static int pwm_stm32_pin_set(struct device *dev, u32_t pwm,
 
 	/* Configure PWM channel */
 	sConfig.OCMode       = TIM_OCMODE_PWM1;
-	sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
+    if (channel == TIM_CHANNEL_1 || channel == TIM_CHANNEL_4) {
+        sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
+    } else {
+	    sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
+    }
+
+	//sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
+	//sConfig.OCPolarity   = TIM_OCPOLARITY_LOW;
 	sConfig.OCFastMode   = TIM_OCFAST_DISABLE;
 	sConfig.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
 	sConfig.OCNIdleState = TIM_OCNIDLESTATE_RESET;
