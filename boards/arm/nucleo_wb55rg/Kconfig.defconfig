@@ -68,6 +68,17 @@ config LPUART_1
 
 endif # BT_DEBUG_MONITOR
 
+config USE_STM32_HAL_RCC
+    default y
+config USE_STM32_HAL_RCC_EX
+    default y
+config USE_STM32_HAL_PWR
+    default y
+config USE_STM32_HAL_PWR_EX
+    default y
+config USE_STM32_HAL_CORTEX
+    default y
+
 if BT
 
 choice BT_HCI_BUS_TYPE
