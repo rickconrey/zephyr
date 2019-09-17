@@ -50,6 +50,7 @@
 #include <drivers/clock_control/stm32_clock_control.h>
 #include <sys/util.h>
 #include <drivers/gpio.h>
+#include <sys/printk.h>
 
 #define LOG_LEVEL CONFIG_USB_DRIVER_LOG_LEVEL
 #include <logging/log.h>
@@ -194,6 +195,7 @@ static int usb_dc_stm32_clock_enable(void)
 	 * STM32F030x4/x6/x8/xC and STM32F070x6/xB.
 	 */
 //#if defined(RCC_HSI48_SUPPORT)
+    printk("RCC_HSI48_SUPPORT.\n");
 
 	/*
 	 * In STM32L0 series, HSI48 requires VREFINT and its buffer
@@ -218,6 +220,7 @@ static int usb_dc_stm32_clock_enable(void)
 
 	LL_RCC_SetUSBClockSource(LL_RCC_USB_CLKSOURCE_HSI48);
 //#elif defined(LL_RCC_USB_CLKSOURCE_NONE)
+//    printk("Clocksource is None.\n");
 //	/* When MSI is configured in PLL mode with a 32.768 kHz clock source,
 //	 * the MSI frequency can be automatically trimmed by hardware to reach
 //	 * better than ±0.25% accuracy. In this mode the MSI can feed the USB
@@ -225,6 +228,7 @@ static int usb_dc_stm32_clock_enable(void)
 //	 * system clock source.
 //	 */
 //#if defined(CONFIG_CLOCK_STM32_MSI_PLL_MODE) && !defined(CONFIG_CLOCK_STM32_SYSCLK_SRC_MSI)
+//    printk("MSI Clock.\n");
 //	LL_RCC_MSI_Enable();
 //	while (!LL_RCC_MSI_IsReady()) {
 //		/* Wait for MSI to become ready */
@@ -304,12 +308,16 @@ static int usb_dc_stm32_init(void)
 	unsigned int i;
 
 #ifdef USB
+    printk("In USB #def.\n");
 	usb_dc_stm32_state.pcd.Instance = USB;
 	usb_dc_stm32_state.pcd.Init.speed = PCD_SPEED_FULL;
 	usb_dc_stm32_state.pcd.Init.dev_endpoints = DT_USB_NUM_BIDIR_ENDPOINTS;
 	usb_dc_stm32_state.pcd.Init.phy_itface = PCD_PHY_EMBEDDED;
 	usb_dc_stm32_state.pcd.Init.ep0_mps = PCD_EP0MPS_64;
-	usb_dc_stm32_state.pcd.Init.low_power_enable = 0;
+	usb_dc_stm32_state.pcd.Init.low_power_enable = DISABLE;
+	usb_dc_stm32_state.pcd.Init.Sof_enable = DISABLE;
+	usb_dc_stm32_state.pcd.Init.lpm_enable = DISABLE;
+	usb_dc_stm32_state.pcd.Init.battery_charging_enable = DISABLE;
 #else /* USB_OTG_FS || USB_OTG_HS */
 #ifdef DT_USB_HS_BASE_ADDRESS
 	usb_dc_stm32_state.pcd.Instance = USB_OTG_HS;
@@ -544,6 +552,7 @@ int usb_dc_ep_configure(const struct usb_dc_ep_cfg_data * const ep_cfg)
 {
 	u8_t ep = ep_cfg->ep_addr;
 	struct usb_dc_stm32_ep_state *ep_state = usb_dc_stm32_get_ep_state(ep);
+    printk("Configuring endpoints: %d\n", ep);
 
 	LOG_DBG("ep 0x%02x, ep_mps %u, ep_type %u", ep_cfg->ep_addr,
 		ep_cfg->ep_mps, ep_cfg->ep_type);
