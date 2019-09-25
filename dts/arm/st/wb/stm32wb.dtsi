@@ -148,9 +148,9 @@
 			label = "LPUART_1";
 		};
 
-		usbotg_fs: usb@40006800 {
+		usb: usb@40006800 {
 			compatible = "st,stm32-usb";
-			reg = <0x40006800 0x40000>;
+			reg = <0x40006800 0x400>;
 			interrupts = <19 0>;
 			interrupt-names = "usb";
 			num-bidir-endpoints = <8>;
@@ -303,7 +303,7 @@
 			#io-channel-cells = <1>;
 		};
 
-	    usb_fs_phy: otgfs_phy {
+	    usb_fs_phy: usbphy {
 	    	compatible = "usb-nop-xceiv";
 	    	#phy-cells = <0>;
 	    	label = "USB_FS_PHY";
