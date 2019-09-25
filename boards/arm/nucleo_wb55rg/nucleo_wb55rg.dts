@@ -93,7 +93,7 @@
 	};
 };
 
-&usbotg_fs {
+&usb {
     status = "okay";
 };
 
