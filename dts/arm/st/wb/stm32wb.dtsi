@@ -148,18 +148,17 @@
 			label = "LPUART_1";
 		};
 
-		usb: usb@40006800 {
+		usb: usb@40005c00 {
 			compatible = "st,stm32-usb";
-			reg = <0x40006800 0x400>;
-			interrupts = <19 0>;
-			interrupt-names = "usb";
+			reg = <0x40005c00 0x400>;
+			interrupts = <20 0>, <19 0>;
+			interrupt-names = "usb", "usbhp";
 			num-bidir-endpoints = <8>;
 			ram-size = <1024>;
-			maximum-speed = "full-speed";
 			phys = <&usb_fs_phy>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x04000000>;
 			status = "disabled";
-			label = "USB";
+			label= "USB";
 		};
 
 		i2c1: i2c@40005400 {
@@ -174,19 +173,20 @@
 			status = "disabled";
 			label= "I2C_1";
 		};
-
-		i2c3: i2c@40005c00 {
+/*
+		i2c3: i2c@40006800 {
 			compatible = "st,stm32-i2c-v2";
 			clock-frequency = <I2C_BITRATE_STANDARD>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			reg = <0x40005c00 0x400>;
+			reg = <0x40006800 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00800000>;
 			interrupts = <32 0>, <33 0>;
 			interrupt-names = "event", "error";
 			status = "disabled";
 			label= "I2C_3";
 		};
+*/
 
 		spi1: spi@40013000 {
 			compatible = "st,stm32-spi";
@@ -210,9 +210,9 @@
 			label = "SPI_2";
 		};
 
-		lptimers1: timers@40007C00 {
+		lptimers1: timers@40007c00 {
 			compatible = "st,stm32-timers";
-			reg = <0x40007C00 0x400>;
+			reg = <0x40007c00 0x400>;
 			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x80000000>;
 			interrupts = <47 0>;
 			status = "disabled";
