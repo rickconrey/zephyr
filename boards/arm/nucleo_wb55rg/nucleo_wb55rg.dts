@@ -72,10 +72,12 @@
 	clock-frequency = <I2C_BITRATE_FAST>;
 };
 
+/*
 &i2c3 {
 	status = "okay";
 	clock-frequency = <I2C_BITRATE_FAST>;
 };
+*/
 
 &spi1 {
 	status = "okay";
@@ -85,7 +87,7 @@
 	status = "okay";
 };
 
-&timers2 {
+&timers1 {
 	status = "okay";
 
 	pwm {
