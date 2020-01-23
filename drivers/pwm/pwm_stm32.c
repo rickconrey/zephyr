@@ -84,10 +84,10 @@ static int pwm_stm32_pin_set(struct device *dev, u32_t pwm,
 		return -EINVAL;
 	}
 
-	if (flags) {
-		/* PWM polarity not supported (yet?) */
-		return -ENOTSUP;
-	}
+	//if (flags) {
+	//	/* PWM polarity not supported (yet?) */
+	//	return -ENOTSUP;
+	//}
 
 	/* configure channel */
 	channel = (pwm - 1)*CHANNEL_LENGTH;
@@ -133,14 +133,19 @@ static int pwm_stm32_pin_set(struct device *dev, u32_t pwm,
 
 	/* Configure PWM channel */
 	sConfig.OCMode       = TIM_OCMODE_PWM1;
-    if (channel == TIM_CHANNEL_1 || channel == TIM_CHANNEL_4) {
-        sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
-    } else {
-	    sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
-    }
+    //if (channel == TIM_CHANNEL_1 || channel == TIM_CHANNEL_4) {
+    //    sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
+    //} else {
+	//    sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
+    //}
 
 	//sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
 	//sConfig.OCPolarity   = TIM_OCPOLARITY_LOW;
+    if (flags) {
+        sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+    } else {
+        sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
+    }
 	sConfig.OCFastMode   = TIM_OCFAST_DISABLE;
 	sConfig.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
 	sConfig.OCNIdleState = TIM_OCNIDLESTATE_RESET;
