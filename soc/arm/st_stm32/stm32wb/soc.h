@@ -53,25 +53,9 @@
 #include <stm32wbxx_ll_system.h>
 #endif /* CONFIG_CLOCK_CONTROL_STM32_CUBE */
 
-#ifdef CONFIG_ADC_STM32
-#include <stm32wbxx_ll_adc.h>
-#endif
-
-#ifdef CONFIG_SPI_STM32
-#include <stm32wbxx_ll_spi.h>
-#endif
-
-#ifdef CONFIG_I2C
-#include <stm32wbxx_ll_i2c.h>
-#endif
-
-#ifdef CONFIG_IWDG_STM32
-#include <stm32wbxx_ll_iwdg.h>
-#endif
-
-#ifdef CONFIG_FLASH
+#if defined(CONFIG_FLASH) || defined(CONFIG_USB)
 #include <stm32wbxx_ll_hsem.h>
-#endif /* CONFIG_FLASH */
+#endif /* CONFIG_FLASH || CONFIG_USB */
 
 #ifdef CONFIG_I2C_STM32
 #include <stm32wbxx_ll_i2c.h>
