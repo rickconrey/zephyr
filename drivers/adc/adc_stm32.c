@@ -348,7 +348,7 @@ static int start_read(const struct device *dev,
 	}
 #else
 	LL_ADC_REG_SetSequencerRanks(adc, table_rank[0], channel);
-	LL_ADC_REG_SetSequencerLength(adc, table_seq_len[0]);
+	LL_ADC_REG_SetSequencerLength(adc, table_seq_len[4]);
 #endif
 	data->channel_count = 1;
 
@@ -383,7 +383,7 @@ static int start_read(const struct device *dev,
 	defined(CONFIG_SOC_SERIES_STM32G0X) || \
 	defined(CONFIG_SOC_SERIES_STM32G4X) || \
 	defined(CONFIG_SOC_SERIES_STM32H7X)
-	LL_ADC_EnableIT_EOC(adc);
+	//LL_ADC_EnableIT_EOC(adc);
 #elif defined(CONFIG_SOC_SERIES_STM32F1X)
 	LL_ADC_EnableIT_EOS(adc);
 #else
@@ -392,7 +392,7 @@ static int start_read(const struct device *dev,
 
 	adc_context_start_read(&data->ctx, sequence);
 
-	return adc_context_wait_for_completion(&data->ctx);
+	//return adc_context_wait_for_completion(&data->ctx);
 }
 
 static void adc_context_start_sampling(struct adc_context *ctx)
