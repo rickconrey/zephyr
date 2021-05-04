@@ -91,7 +91,8 @@ static void stm32wb_start_ble(void)
 	    CFG_BLE_MAX_ATT_MTU,
 	    CFG_BLE_SLAVE_SCA,
 	    CFG_BLE_MASTER_SCA,
-	    CFG_BLE_LSE_SOURCE,
+        1,
+	    //CFG_BLE_LSE_SOURCE,
 	    CFG_BLE_MAX_CONN_EVENT_LENGTH,
 	    CFG_BLE_HSE_STARTUP_TIME,
 	    CFG_BLE_VITERBI_MODE,
@@ -371,27 +372,28 @@ static void start_ble_rf(void)
 		LL_RCC_ReleaseBackupDomainReset();
 	}
 
-#if STM32_LSE_CLOCK
-	/* Select LSE clock */
-	LL_RCC_LSE_Enable();
-	while (!LL_RCC_LSE_IsReady()) {
-	}
+//#if STM32_LSE_CLOCK
+//	/* Select LSE clock */
+//	LL_RCC_LSE_Enable();
+//	while (!LL_RCC_LSE_IsReady()) {
+//	}
 
 	/* Select wakeup source of BLE RF */
-	LL_RCC_SetRFWKPClockSource(LL_RCC_RFWKP_CLKSOURCE_LSE);
+	//LL_RCC_SetRFWKPClockSource(LL_RCC_RFWKP_CLKSOURCE_LSE);
+	LL_RCC_SetRFWKPClockSource(LL_RCC_RFWKP_CLKSOURCE_HSE_DIV1024);
 	LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSE);
 
 	/* Switch OFF LSI */
 	LL_RCC_LSI2_Disable();
-#else
-	LL_RCC_LSI2_Enable();
-	while (!LL_RCC_LSI2_IsReady()) {
-	}
-
-	/* Select wakeup source of BLE RF */
-	LL_RCC_SetRFWKPClockSource(LL_RCC_RFWKP_CLKSOURCE_LSI);
-	LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
-#endif
+//#else
+//	LL_RCC_LSI2_Enable();
+//	while (!LL_RCC_LSI2_IsReady()) {
+//	}
+//
+//	/* Select wakeup source of BLE RF */
+//	LL_RCC_SetRFWKPClockSource(LL_RCC_RFWKP_CLKSOURCE_LSI);
+//	LL_RCC_SetRTCClockSource(LL_RCC_RTC_CLKSOURCE_LSI);
+//#endif
 
 	/* Set RNG on HSI48 */
 	LL_RCC_HSI48_Enable();
