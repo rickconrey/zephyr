@@ -374,9 +374,9 @@ static void start_ble_rf(void)
 
 //#if STM32_LSE_CLOCK
 //	/* Select LSE clock */
-//	LL_RCC_LSE_Enable();
-//	while (!LL_RCC_LSE_IsReady()) {
-//	}
+	LL_RCC_LSE_Enable();
+	while (!LL_RCC_LSE_IsReady()) {
+	}
 
 	/* Select wakeup source of BLE RF */
 	//LL_RCC_SetRFWKPClockSource(LL_RCC_RFWKP_CLKSOURCE_LSE);
