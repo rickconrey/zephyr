@@ -241,6 +241,9 @@ static int pwm_stm32_pin_set(const struct device *dev, uint32_t pwm,
 		oc_init.CompareValue = pulse_cycles;
 		oc_init.OCPolarity = get_polarity(flags);
 
+		oc_init.OCNState = LL_TIM_OCSTATE_ENABLE;
+		oc_init.OCNPolarity = get_polarity(flags);
+
 		if (LL_TIM_OC_Init(cfg->timer, channel, &oc_init) != SUCCESS) {
 			LOG_ERR("Could not initialize timer channel output");
 			return -EIO;
